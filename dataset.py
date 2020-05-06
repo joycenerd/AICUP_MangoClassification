@@ -6,9 +6,9 @@ from PIL import Image
 
 
 label_dict={
-    'A':1,
-    'B':2,
-    'C':3
+    'A':0,
+    'B':1,
+    'C':2
 }
 
 

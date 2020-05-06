@@ -42,7 +42,7 @@ def train():
 
             optimizer.zero_grad()
             outputs=model(inputs)
-            
+
             _, preds = torch.max(outputs.data, 1)
             loss = criterion(outputs, labels)
             
