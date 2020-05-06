@@ -23,11 +23,13 @@ class MangoDataset(Dataset):
 
         if root_dir.name=='C1-P1_Train':
             labels=np.genfromtxt(Path(opt.data_root).joinpath('train.csv'),dtype=np.str,delimiter=',',skip_header=1)
-            for label in labels:
-                self.x.append(label[0])
-                self.y.append(label_dict[label[1]])
+        
         else:
             labels=np.genfromtxt(Path(opt.data_root).joinpath('dev.csv'),dtype=np.str,delimiter=',',skip_header=1)
+
+        for label in labels:
+                self.x.append(label[0])
+                self.y.append(label_dict[label[1]])
 
     def __len__(self):
         return len(self.x)
@@ -72,7 +74,7 @@ def make_dataset():
         ])
 
     data_transform=transforms.Compose([
-        transforms.Resize(224),
+        transforms.Resize((224,224)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
