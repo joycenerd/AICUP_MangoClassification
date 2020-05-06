@@ -13,13 +13,12 @@ from evaluation import eval
 def train():
     data_transform=transforms.Compose([
         transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(p=0.5),
-        transforms.RandomVerticalFlip(p=0.5)
-        transforms.RandomRotate(degree=25),
-        transforms.CenterCrop((150)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.RandomRotation(degrees=25),
+        transforms.CenterCrop(224),
         transforms.ColorJitter(brightness=0.4,contrast=0.4,saturation=0.4,hue=0.4),
         transforms.RandomAffine(15),
-        transforms.Lambda(lambda x : x + torch.randn_like(x))
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
     ])
