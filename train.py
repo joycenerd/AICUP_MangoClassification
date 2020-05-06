@@ -1,4 +1,4 @@
-from dataset import MangoDataset,Dataloader
+from dataset import make_dataset,Dataloader
 from options import opt
 from pathlib import Path
 from torchvision import transforms
@@ -11,19 +11,7 @@ from evaluation import eval
 
 
 def train():
-    data_transform=transforms.Compose([
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomVerticalFlip(),
-        transforms.RandomRotation(degrees=25),
-        transforms.CenterCrop(224),
-        transforms.ColorJitter(brightness=0.4,contrast=0.4,saturation=0.4,hue=0.4),
-        transforms.RandomAffine(15),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
-    ])
-
-    train_set=MangoDataset(Path(opt.data_root).joinpath('C1-P1_Train'),data_transform)
+    train_set=make_dataset()
     data_loader=Dataloader(dataset=train_set,batch_size=opt.train_batch_size,shuffle=True,num_workers=opt.train_num_workers)
     
     model=RESNET(num_classes=opt.num_classes)

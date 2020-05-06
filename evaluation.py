@@ -1,5 +1,5 @@
 from torchvision import transforms
-from dataset import MangoDataset,Dataloader
+from dataset import make_dataset,Dataloader
 from options import opt
 from pathlib import Path
 import torch
@@ -8,13 +8,7 @@ from torch.autograd import Variable
 
 
 def eval():
-	data_transform=transforms.Compose([
-		transforms.RandomResizedCrop(224),
-		transforms.ToTensor(),
-		transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
-		])
-
-	eval_set=MangoDataset(Path(opt.data_root).joinpath('C1-P1_Dev'),data_transform)
+	eval_set=make_dataset()
 	data_loader=Dataloader(dataset=eval_set,batch_size=opt.eval_batch_size,shuffle=True,num_workers=opt.eval_num_workers)
 
 	weight_path=Path(opt.checkpoint_dir).joinpath(opt.weight_path)
