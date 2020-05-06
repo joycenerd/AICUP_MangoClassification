@@ -7,6 +7,7 @@ from model import RESNET
 import torch
 import torch.nn as nn
 import copy
+from evaluation import eval
 
 
 def train():
@@ -61,12 +62,12 @@ def train():
             best_model_params = copy.deepcopy(model.state_dict())
         
     model.load_state_dict(best_model_params)
-    torch.save(model, f'model-{best_acc:.02f}-best_train_acc.pth')
+    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_train_acc.pth')
+    torch.save(model, str(weight_path))
         
 
-
-
-
-
 if __name__=="__main__":
-    train()
+    if opt.mode=='train':
+        train()
+    elif opt.mode=='evaluate':
+        eval()

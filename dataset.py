@@ -23,8 +23,8 @@ class MangoDataset(Dataset):
         if root_dir.name=='C1-P1_Train':
             labels=np.genfromtxt(Path(opt.data_root).joinpath('train.csv'),dtype=np.str,delimiter=',',skip_header=1)
         else:
-            labels=np.genfromtxt(Path(opt.data_root).joinpath('dev.csv'),dtype=np.str,delimiter=',')
-        
+            labels=np.genfromtxt(Path(opt.data_root).joinpath('dev.csv'),dtype=np.str,delimiter=',',skip_header=1)
+
         for label in labels:
             self.x.append(label[0])
             self.y.append(label_dict[label[1]])
