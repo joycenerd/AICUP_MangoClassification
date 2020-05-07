@@ -53,7 +53,10 @@ def train():
 
         if training_acc > best_acc:
             best_acc = training_acc
+            best_train_loss=training_loss
             best_model_params = copy.deepcopy(model.state_dict())
+
+    print(f'Best training loss: {best_train_loss:.4f}\t Best accuracy: {best_acc:.4f}\n')
         
     model.load_state_dict(best_model_params)
     weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_train_acc.pth')
