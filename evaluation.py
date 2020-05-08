@@ -1,38 +1,56 @@
-from torchvision import transforms
-from dataset import make_dataset,Dataloader
+from dataset import eval_data_transform,MangoDataset,Dataloader,make_dataset
 from options import opt
 from pathlib import Path
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+from torchvision import transforms
+import numpy as np
+from PIL import Image
+
+label_dict={
+    'A':0,
+    'B':1,
+    'C':2
+}
 
 
-def eval():
-	eval_set=make_dataset()
-	data_loader=Dataloader(dataset=eval_set,batch_size=opt.eval_batch_size,shuffle=True,num_workers=opt.eval_num_workers)
+def evaluation():
+	eval_set=MangoDataset(Path(opt.data_root).joinpath('C1-P1_Dev'))
+	# data_loader=Dataloader(dataset=eval_set,batch_size=opt.eval_batch_size,shuffle=False,num_workers=opt.eval_num_workers)
+	weight_path = Path(opt.checkpoint_dir).joinpath(opt.weight_path)
 
-	weight_path=Path(opt.checkpoint_dir).joinpath(opt.weight_path)
-
-	model=torch.load(weight_path)
-	model=model.cuda(opt.cuda_devices)
+	model = torch.load(weight_path)
+	model = model.cuda(opt.cuda_devices)
 	model.eval()
 
 	criterion = nn.CrossEntropyLoss()
 
-	evaluation_loss=0.0
-	evaluation_corrects=0
+	evaluation_loss = 0.0
+	evaluation_corrects = 0
 
-	for i,(inputs,labels) in enumerate(data_loader):
-		inputs=Variable(inputs.cuda(opt.cuda_devices))
-		labels=Variable(labels.cuda(opt.cuda_devices))
+	for i,(image,label) in enumerate(eval_set):
+		image_1, image_2, image_3 = eval_data_transform(image)
+		label=np.asarray([label])
+		label=torch.from_numpy(label)
 
-		outputs=model(inputs)
+		input_1 = Variable(image_1.cuda(opt.cuda_devices))
+		input_2 = Variable(image_2.cuda(opt.cuda_devices))
+		input_3 = Variable(image_3.cuda(opt.cuda_devices))
+		label=Variable(label.cuda(opt.cuda_devices))
 
-		_, preds = torch.max(outputs.data, 1)
-		loss = criterion(outputs, labels)
+		output_1 = model(input_1)
+		output_2 = model(input_2)
+		output_3 = model(input_3)
 
-		evaluation_loss += loss.item() * inputs.size(0)
-		evaluation_corrects += torch.sum(preds == labels.data)
+		output = output_1+output_2+output_3
+
+		_, preds = torch.max(output.data, 1)
+		output/=3
+		loss = criterion(output/3, label)
+
+		evaluation_loss += loss.item() * input_1.size(0)
+		evaluation_corrects += torch.sum(preds == label.data)
 
 	evaluation_loss = evaluation_loss / len(eval_set)
 	evaluation_acc = float(evaluation_corrects) / len(eval_set)

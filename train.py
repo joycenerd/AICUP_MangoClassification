@@ -7,7 +7,7 @@ from model import RESNET
 import torch
 import torch.nn as nn
 import copy
-from evaluation import eval
+from evaluation import evaluation
 
 
 def train():
@@ -72,4 +72,4 @@ if __name__=="__main__":
     if opt.mode=='train':
         train()
     elif opt.mode=='evaluate':
-        eval()
+        evaluation()
