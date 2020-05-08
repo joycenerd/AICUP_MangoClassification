@@ -56,6 +56,11 @@ def train():
             best_train_loss=training_loss
             best_model_params = copy.deepcopy(model.state_dict())
 
+        if (epoch+1)%50==0:
+            model.load_state_dict(best_model_params)
+            weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{epoch+1}epoch-{best_acc:.4f}-best_train_acc.pth')
+            torch.save(model,str(weight_path))
+
     print(f'Best training loss: {best_train_loss:.4f}\t Best accuracy: {best_acc:.4f}\n')
         
     model.load_state_dict(best_model_params)
