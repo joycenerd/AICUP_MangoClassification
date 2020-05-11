@@ -106,11 +106,4 @@ def train():
         
 
 if __name__=="__main__":
-<<<<<<< HEAD
-    if opt.mode=='train':
-        train()
-    elif opt.mode=='evaluate':
-        evaluation()
-=======
     train()
->>>>>>> b3504a649e2468d1ede74ff8debeccada680bf66
