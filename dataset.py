@@ -58,38 +58,9 @@ def _random_colour_space(x):
     output = x.convert("HSV")
     return output
 
-
-class GaussianNoise(nn.Module):
-    """Gaussian noise regularizer.
-
-    Args:
-        sigma (float, optional): relative standard deviation used to generate the
-            noise. Relative means that it will be multiplied by the magnitude of
-            the value your are adding the noise to. This means that sigma can be
-            the same regardless of the scale of the vector.
-        is_relative_detach (bool, optional): whether to detach the variable before
-            computing the scale of the noise. If `False` then the scale of the noise
-            won't be seen as a constant but something to optimize: this will bias the
-            network to generate vectors with smaller values.
-    """
-
-    def __init__(self, sigma=0.1, is_relative_detach=True):
-        super().__init__()
-        self.sigma = sigma
-        self.is_relative_detach = is_relative_detach
-        self.noise = torch.tensor(0).to(opt.cuda_devices)
-
-    def forward(self, x):
-        if self.training and self.sigma != 0:
-            scale = self.sigma * x.detach() if self.is_relative_detach else self.sigma * x
-            sampled_noise = self.noise.repeat(*x.size()).normal_() * scale
-            x = x + sampled_noise
-        return x 
-
 def make_dataset(_dir):
 
     colour_transform = transforms.Lambda(lambda x: _random_colour_space(x))
-    # random_gaussian_noise=transforms.Lambda(RandomGaussianNoise(mean=0.5,std=0.01))
 
     data_transform_1=transforms.Compose([
         transforms.RandomResizedCrop(224),
@@ -113,7 +84,6 @@ def make_dataset(_dir):
         transforms.RandomResizedCrop(224),
         transforms.RandomChoice([
             transforms.RandomApply([colour_transform]),
-            transforms.Lambda(GaussianNoise()),
             transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.2, hue=0),
             transforms.RandomGrayscale(p=0.1)
         ]),
@@ -133,7 +103,6 @@ def make_dataset(_dir):
     # print("\nAfter third\n")
     data_set=data_set_1+data_set_2+data_set_3
 
-    return image_1,image_2,image_3
-
+    return data_set
 
 

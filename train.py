@@ -19,7 +19,6 @@ def train():
     
     model=RESNET(num_classes=opt.num_classes)
     model=model.cuda(opt.cuda_devices)
-    model.train()
 
     best_model_params = copy.deepcopy(model.state_dict())
     lowest_loss=float("inf")
@@ -35,11 +34,11 @@ def train():
         training_loss = 0.0
         training_corrects = 0
 
+        model.train()
+
         for i, (inputs,labels) in enumerate(train_loader):
-            print(inputs.size(0))
             inputs=Variable(inputs.cuda(opt.cuda_devices))
             labels=Variable(labels.cuda(opt.cuda_devices))
-            print(" "+str(labels.size(0)))
 
             optimizer.zero_grad()
             outputs=model(inputs)
