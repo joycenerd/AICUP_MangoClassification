@@ -92,16 +92,23 @@ def make_dataset(_dir):
     ])
 
     data_transform=transforms.Compose([
-        transforms.ToTensor()
+        transforms.Resize((224,224)),
+        transforms.RandomChoice([
+            transforms.RandomRotation((-45,45)),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+        ]),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
 
-    data_set_1=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_1)
-    # print("\nAfter first\n")
-    data_set_2=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_2)
-    # print("\nAfter second\n")
-    data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
-    # print("\nAfter third\n")
-    data_set=data_set_1+data_set_2+data_set_3
+    if(_dir=='C1-P1_Train'):
+        data_set_1=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_1)
+        data_set_2=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_2)
+        data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
+        data_set=data_set_1+data_set_2+data_set_3
+    elif(_dir=='C1-P1_Dev'):
+        data_set=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform)
 
     return data_set
 

@@ -21,7 +21,7 @@ def train():
     model=model.cuda(opt.cuda_devices)
 
     best_model_params = copy.deepcopy(model.state_dict())
-    lowest_loss=float("inf")
+    best_acc=0.0
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=model.parameters(), lr=0.001, momentum=0.9)
 
@@ -79,12 +79,12 @@ def train():
 
         print(f'Dev loss: {dev_loss:.4f}\taccuracy: {dev_acc:.4f}\n')
 
-        if dev_loss < lowest_loss:
-            lowest_loss = dev_loss
-            best_dev_acc=dev_acc
+        if dev_acc > best_acc:
+            best_acc = dev_acc
+            best_dev_loss = dev_loss
 
-            best_train_loss=training_loss
-            best_acc=training_acc
+            best_train_acc=training_acc
+            best_train_loss=training_loss 
 
             best_model_params = copy.deepcopy(model.state_dict())
 
@@ -93,11 +93,11 @@ def train():
             weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{epoch+1}epoch-{best_acc:.02f}-best_train_acc.pth')
             torch.save(model,str(weight_path))
             record.write(f'{epoch+1}\n')
-            record.write(f'Best training loss: {best_train_loss:.4f}\tBest training accuracy: {best_acc:.4f}\n')
-            record.write(f'Best dev loss: {lowest_loss:.4f}\tBest dev accuracy: {best_dev_acc:.4f}\n\n')
+            record.write(f'Best training loss: {best_train_loss:.4f}\tBest training accuracy: {best_train_acc:.4f}\n')
+            record.write(f'Best dev loss: {best_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
 
-    print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_acc:.4f}')
-    print(f'Best dev loss: {lowest_loss:.4f}\t Best dev accuracy: {best_dev_acc:.4f}\n')
+    print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
+    print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
         
     model.load_state_dict(best_model_params)
     weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_train_acc.pth')
