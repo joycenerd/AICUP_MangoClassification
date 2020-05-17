@@ -100,7 +100,7 @@ def train():
     print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
         
     model.load_state_dict(best_model_params)
-    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_train_acc.pth')
+    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_valid_acc.pth')
     torch.save(model, str(weight_path))
         
 
