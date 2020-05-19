@@ -3,7 +3,7 @@ from options import opt
 from pathlib import Path
 from torchvision import transforms
 from torch.autograd import Variable
-from model import RESNET
+from model.resnest.restnest import resnest50
 import torch
 import torch.nn as nn
 import copy
@@ -17,7 +17,8 @@ def train():
     dev_set=make_dataset('C1-P1_Dev')
     dev_loader=Dataloader(dataset=dev_set,batch_size=opt.dev_batch_size,shuffle=True,num_workers=opt.num_workers)
     
-    model=RESNET(num_classes=opt.num_classes)
+    # model=RESNET(num_classes=opt.num_classes)
+    model=resnest50(num_classes=opt.num_classes)
     model=model.cuda(opt.cuda_devices)
 
     best_model_params = copy.deepcopy(model.state_dict())

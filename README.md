@@ -10,6 +10,7 @@ Code for AI CUP 2020 Mango Image Recognition Challenge: Grade Classification and
 pytorch
 torchvision
 cudatoolkit=10.1
+rfconv
 ```
 
 ## Setup
