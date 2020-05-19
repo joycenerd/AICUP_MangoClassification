@@ -1,3 +1,4 @@
 pytorch
-torchvision
-cudatoolkit=10.1
+pip install torchvision
+cudatoolkit
+pip install rfconv

@@ -1,7 +1,9 @@
 import torch.nn as nn
 import torchvision.models as models
 import torch
-from ...options import opt
+import sys
+# from ...options import opt
+from options import opt
 import math
 from .splat import SplAtConv2d
 
