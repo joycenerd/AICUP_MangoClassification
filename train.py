@@ -23,8 +23,10 @@ def train():
 
     best_model_params = copy.deepcopy(model.state_dict())
     best_acc=0.0
+
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=model.parameters(), lr=0.001, momentum=0.9)
+    scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,T_max=0.0140625,eta_min=0,last_epoch=5)
 
     record=open('record.txt','w')
 
@@ -35,6 +37,7 @@ def train():
         training_loss = 0.0
         training_corrects = 0
 
+        scheduler.step()
         model.train()
 
         for i, (inputs,labels) in enumerate(train_loader):
