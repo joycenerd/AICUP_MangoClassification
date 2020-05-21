@@ -58,6 +58,24 @@ def _random_colour_space(x):
     output = x.convert("HSV")
     return output
 
+class RandomShift(object):
+    def __init__(self, shift):
+        self.shift = shift
+        
+    @staticmethod
+    def get_params(shift):
+        """Get parameters for ``rotate`` for a random rotation.
+        Returns:
+            sequence: params to be passed to ``rotate`` for random rotation.
+        """
+        hshift, vshift = np.random.uniform(-shift, shift, size=2)
+
+        return hshift, vshift 
+    def __call__(self, img):
+        hshift, vshift = self.get_params(self.shift)
+        
+        return img.transform(img.size, Image.AFFINE, (1,0,hshift,0,1,vshift), resample=Image.BICUBIC, fill=1) 
+
 def make_dataset(_dir):
 
     colour_transform = transforms.Lambda(lambda x: _random_colour_space(x))
@@ -75,6 +93,7 @@ def make_dataset(_dir):
             transforms.RandomHorizontalFlip(),
             transforms.RandomVerticalFlip(),
             transforms.RandomAffine(degrees=10,shear=50),
+            RandomShift(3)
         ]),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
@@ -91,7 +110,7 @@ def make_dataset(_dir):
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
     ])
 
-    data_transform=transforms.Compose([
+    data_transform_a=transforms.Compose([
         transforms.Resize((224,224)),
         transforms.RandomChoice([
             transforms.RandomRotation((-45,45)),
@@ -102,14 +121,25 @@ def make_dataset(_dir):
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
 
+    data_transform_b=transforms.Compose([
+        transforms.Resize((882,882)),
+        transforms.RandomChoice([
+            transforms.CenterCrop(224),
+            transforms.CenterCrop(320),
+        ]),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
+    ])
+
     if(_dir=='C1-P1_Train'):
         data_set_1=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_1)
         data_set_2=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_2)
         data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
         data_set=data_set_1+data_set_2+data_set_3
     elif(_dir=='C1-P1_Dev'):
-        data_set=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform)
-
+        data_set_a=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_a)
+        data_set_b=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_b)
+        data_set=data_set_a+data_set_b
     return data_set
 
 
