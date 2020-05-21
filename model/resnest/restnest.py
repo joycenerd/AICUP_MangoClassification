@@ -271,5 +271,4 @@ class ResNet(nn.Module):
 def resnest50(num_classes,pretrained=False,**kwargs):
     model=ResNet(Bottleneck, [3, 4, 6, 3], radix=2, groups=1, bottleneck_width=64, num_classes=num_classes, deep_stem=True, stem_width=32,
                  avg_down=True, avd=True, avd_first=False, **kwargs)
-
     return model

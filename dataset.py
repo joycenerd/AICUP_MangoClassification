@@ -122,11 +122,8 @@ def make_dataset(_dir):
         ])
 
     data_transform_b=transforms.Compose([
-        transforms.Resize((882,882)),
-        transforms.RandomChoice([
-            transforms.CenterCrop(224),
-            transforms.CenterCrop(320),
-        ]),
+        transforms.Resize((320,320)),
+        transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
     ])

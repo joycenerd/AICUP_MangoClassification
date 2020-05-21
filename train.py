@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import copy
 from evaluation import evaluation
+# from resnest.torch import resnest50
 
 
 def train():
@@ -16,17 +17,16 @@ def train():
 
     dev_set=make_dataset('C1-P1_Dev')
     dev_loader=Dataloader(dataset=dev_set,batch_size=opt.dev_batch_size,shuffle=True,num_workers=opt.num_workers)
-    
-    # model=RESNET(num_classes=opt.num_classes)
-    model=resnest50(num_classes=opt.num_classes)
+
+    model = resnest50(num_classes=opt.num_classes)
     model=model.cuda(opt.cuda_devices)
 
     best_model_params = copy.deepcopy(model.state_dict())
     best_acc=0.0
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(params=model.parameters(), lr=0.001, momentum=0.9)
-    scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,T_max=0.0140625,eta_min=0,last_epoch=5)
+    optimizer = torch.optim.SGD(params=model.parameters(), lr=0.0140625, momentum=0.9, weight_decay=0.0001)
+    scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0, last_epoch=-1)
 
     record=open('record.txt','w')
 
@@ -37,7 +37,6 @@ def train():
         training_loss = 0.0
         training_corrects = 0
 
-        scheduler.step()
         model.train()
 
         for i, (inputs,labels) in enumerate(train_loader):
@@ -52,6 +51,7 @@ def train():
             
             loss.backward()
             optimizer.step()
+            scheduler.step()
 
             training_loss += loss.item() * inputs.size(0)
             training_corrects += torch.sum(preds == labels.data)
