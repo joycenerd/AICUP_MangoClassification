@@ -272,3 +272,15 @@ def resnest50(num_classes,pretrained=False,**kwargs):
     model=ResNet(Bottleneck, [3, 4, 6, 3], radix=2, groups=1, bottleneck_width=64, num_classes=num_classes, deep_stem=True, stem_width=32,
                  avg_down=True, avd=True, avd_first=False, **kwargs)
     return model
+
+def resnest101(num_classes,pretrained=False, **kwargs):
+    model = ResNet(Bottleneck, [3, 4, 23, 3], radix=2, groups=1, 
+                    bottleneck_width=64, deep_stem=True, stem_width=64, avg_down=True,
+                   avd=True, avd_first=False, **kwargs)
+    return  model
+
+def get_model(model):
+    if model=="resnest50":
+        return resnest50
+    elif model=="resnest101":
+        return resnest101
