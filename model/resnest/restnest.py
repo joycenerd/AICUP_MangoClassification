@@ -279,8 +279,16 @@ def resnest101(num_classes,pretrained=False, **kwargs):
                    avd=True, avd_first=False, **kwargs)
     return  model
 
+def resnest200(pretrained=False, root='~/.encoding/models', **kwargs):
+    model = ResNet(Bottleneck, [3, 24, 36, 3], radix=2, groups=1, 
+                   bottleneck_width=64, deep_stem=True, stem_width=64, avg_down=True,
+                   avd=True, avd_first=False, **kwargs)
+    return model
+
 def get_model(model):
     if model=="resnest50":
         return resnest50
     elif model=="resnest101":
         return resnest101
+    elif model=="resnest200":
+        return resnest200
