@@ -1,0 +1,20 @@
+50
+Best training loss: 0.5994	Best training accuracy: 0.7340
+Best dev loss: 0.4802	Best dev accuracy: 0.7963
+
+100
+Best training loss: 0.5290	Best training accuracy: 0.7678
+Best dev loss: 0.4834	Best dev accuracy: 0.7994
+
+150
+Best training loss: 0.5290	Best training accuracy: 0.7678
+Best dev loss: 0.4834	Best dev accuracy: 0.7994
+
+200
+Best training loss: 0.4635	Best training accuracy: 0.8011
+Best dev loss: 0.5177	Best dev accuracy: 0.8013
+
+250
+Best training loss: 0.4635	Best training accuracy: 0.8011
+Best dev loss: 0.5177	Best dev accuracy: 0.8013
+
