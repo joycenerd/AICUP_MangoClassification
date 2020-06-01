@@ -2,3 +2,4 @@ pytorch
 pip install torchvision
 cudatoolkit
 pip install rfconv
+pip install --upgrade efficientnet-pytorch

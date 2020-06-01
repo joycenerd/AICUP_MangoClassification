@@ -9,6 +9,8 @@ import torch.nn as nn
 import copy
 from evaluation import evaluation
 # from resnest.torch import resnest50
+from efficientnet_pytorch import EfficientNet
+from model.model_utils import get_net
 
 
 def train():
@@ -18,8 +20,10 @@ def train():
     dev_set=make_dataset('C1-P1_Dev')
     dev_loader=Dataloader(dataset=dev_set,batch_size=opt.dev_batch_size,shuffle=True,num_workers=opt.num_workers)
 
-    net=get_model(opt.model)
-    model=net(opt.num_classes)
+    net=get_net(opt.model)
+    if (opt.model[0:9] == 'resnest'):
+        model=net(opt.num_classes)
+    model = net
     model=model.cuda(opt.cuda_devices)
 
     best_model_params = copy.deepcopy(model.state_dict())
