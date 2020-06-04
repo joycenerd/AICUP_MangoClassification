@@ -11,6 +11,8 @@ from evaluation import evaluation
 # from resnest.torch import resnest50
 from efficientnet_pytorch import EfficientNet
 from model.model_utils import get_net
+from tqdm import tqdm
+from visual import visualization
 
 
 def train():
@@ -28,10 +30,14 @@ def train():
 
     best_model_params = copy.deepcopy(model.state_dict())
     best_acc=0.0
+    training_loss_list = []
+    training_acc_list = []
+    dev_loss_list = []
+    dev_acc_list = []
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
-    scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0, last_epoch=-1)
+    # scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0, last_epoch=-1)
 
     record=open('record.txt','w')
 
@@ -44,7 +50,7 @@ def train():
 
         model.train()
 
-        for i, (inputs,labels) in enumerate(train_loader):
+        for i, (inputs,labels) in enumerate(tqdm(train_loader)):
             inputs=Variable(inputs.cuda(opt.cuda_devices))
             labels=Variable(labels.cuda(opt.cuda_devices))
 
@@ -56,13 +62,16 @@ def train():
             
             loss.backward()
             optimizer.step()
-            scheduler.step()
+            # scheduler.step()
 
             training_loss += loss.item() * inputs.size(0)
             training_corrects += torch.sum(preds == labels.data)
         
         training_loss = training_loss / len(train_set)
         training_acc = float(training_corrects) / len(train_set)
+
+        training_loss_list.append(training_loss)
+        training_acc_list.append(training_acc)
 
         print(f'Training loss: {training_loss:.4f}\taccuracy: {training_acc:.4f}')
 
@@ -71,7 +80,7 @@ def train():
         dev_loss=0.0
         dev_corrects=0
 
-        for i,(inputs,labels) in enumerate(dev_loader):
+        for i,(inputs,labels) in enumerate(tqdm(dev_loader)):
             inputs=Variable(inputs.cuda(opt.cuda_devices))
             labels=Variable(labels.cuda(opt.cuda_devices))
 
@@ -85,6 +94,9 @@ def train():
 
         dev_loss=dev_loss/len(dev_set)
         dev_acc=float(dev_corrects)/len(dev_set)
+
+        dev_loss_list.append(dev_loss)
+        dev_acc_list.append(dev_acc)
 
         print(f'Dev loss: {dev_loss:.4f}\taccuracy: {dev_acc:.4f}\n')
 
@@ -111,6 +123,8 @@ def train():
     model.load_state_dict(best_model_params)
     weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_valid_acc.pth')
     torch.save(model, str(weight_path))
+
+    visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list)
         
 
 if __name__=="__main__":

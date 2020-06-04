@@ -81,13 +81,13 @@ def make_dataset(_dir):
     colour_transform = transforms.Lambda(lambda x: _random_colour_space(x))
 
     data_transform_1=transforms.Compose([
-        transforms.RandomResizedCrop(224),
+        transforms.RandomResizedCrop(opt.img_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
 
     data_transform_2=transforms.Compose([
-        transforms.RandomResizedCrop(224),   
+        transforms.RandomResizedCrop(opt.img_size ),   
         transforms.RandomChoice([
             transforms.RandomRotation((-45,45)),
             transforms.RandomHorizontalFlip(),
@@ -100,7 +100,7 @@ def make_dataset(_dir):
         ])
 
     data_transform_3=transforms.Compose([
-        transforms.RandomResizedCrop(224),
+        transforms.RandomResizedCrop(opt.img_size),
         transforms.RandomChoice([
             transforms.RandomApply([colour_transform]),
             transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.2, hue=0),
@@ -111,7 +111,7 @@ def make_dataset(_dir):
     ])
 
     data_transform_a=transforms.Compose([
-        transforms.Resize((224,224)),
+        transforms.Resize((opt.img_size,opt.img_size)),
         transforms.RandomChoice([
             transforms.RandomRotation((-45,45)),
             transforms.RandomHorizontalFlip(),
@@ -122,8 +122,8 @@ def make_dataset(_dir):
         ])
 
     data_transform_b=transforms.Compose([
-        transforms.Resize((320,320)),
-        transforms.CenterCrop(224),
+        transforms.Resize((480,480)),
+        transforms.CenterCrop(opt.img_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
     ])
