@@ -39,7 +39,7 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
     
-    scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.3, last_epoch=-1)
+    scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
     record=open('record.txt','w')
 
     for epoch in range(opt.epochs):
