@@ -17,4 +17,5 @@ parser.add_argument('--dev_batch_size',type=int,default=4,help='The batch size f
 parser.add_argument('--checkpoint_dir',type=str,default=Path(ROOTPATH).joinpath('checkpoint'),help='Directory to save all your checkpoint.pth')
 parser.add_argument('--weight_path',type=str,help='The path of checkpoint.pth to retrieve weight')
 parser.add_argument('--img_size', type=int, default=380, help='Input image size')
+parser.add_argument('--test_root', type=str, default=Path(ROOTPATH).joinpath('C1-P1_Test'), help='testset path')
 opt=parser.parse_args()

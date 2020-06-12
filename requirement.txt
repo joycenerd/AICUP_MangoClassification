@@ -5,3 +5,4 @@ pip install rfconv
 pip install --upgrade efficientnet-pytorch
 conda install tqdm
 conda install matplotlib
+conda install pandas

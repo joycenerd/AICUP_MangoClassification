@@ -13,7 +13,7 @@ from efficientnet_pytorch import EfficientNet
 from model.model_utils import get_net
 from tqdm import tqdm
 from visual import visualization
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR, CosineAnnealingLR
 
 
 def train():
@@ -39,8 +39,7 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
     
-    # scheduler=torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=len(train_loader), eta_min=0, last_epoch=-1)
-    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, min_lr=1e-16, cooldown=1)
+    scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.3, last_epoch=-1)
     record=open('record.txt','w')
 
     for epoch in range(opt.epochs):
@@ -103,6 +102,10 @@ def train():
         print(f'Dev loss: {dev_loss:.4f}\taccuracy: {dev_acc:.4f}\n')
 
         scheduler.step(dev_acc)
+
+        if (epoch+1)==101:
+            optimizer = torch.optim.SGD(params=model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0001)
+            scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, min_lr=1e-16, cooldown=1)
 
         if dev_acc > best_acc:
             best_acc = dev_acc
