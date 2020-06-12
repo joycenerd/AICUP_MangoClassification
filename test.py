@@ -10,7 +10,7 @@ from torch.autograd import Variable
 from options import opt
 
 
-ROOTDIR="/mnt/md0/new-home/joycenerd/AICUP_MangoClassification"
+ROOTDIR="/mnt/hdd1/home/joycenerd/AICUP_MangoClassification"
 
 label_dict = {
     0 : 'A',
@@ -44,11 +44,11 @@ def test():
         outputs =  model(inputs)
 
         _,preds = torch.max(outputs.data,1)
-        submission['lable'][i] =  label_dict[preds[0]]
+        submission['label'][i] =  label_dict[preds[0].item()]
 
-        print(filename + 'complete')
+        print(filename + ' complete')
 
-    submission.to_csv(Path(ROOTDIR).joinpath('submission,csv'), index=False)
+    submission.to_csv(Path(ROOTDIR).joinpath('submission.csv'), index=False)
 
 
 if __name__=='__main__':
