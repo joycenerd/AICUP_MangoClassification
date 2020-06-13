@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 
-ROOTPATH="/mnt/hdd1/home/joycenerd/AICUP_MangoClassification"
+ROOTPATH="/mnt/md0/new-home/joycenerd/AICUP_MangoClassification"
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--data_root',type=str,default=Path(ROOTPATH).joinpath('C1-P1_Train Dev_fixed'),help='Your dataset root directory')

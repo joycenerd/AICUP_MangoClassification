@@ -8,9 +8,10 @@ from PIL import Image
 import torch
 from torch.autograd import Variable
 from options import opt
+import numpy as np
 
 
-ROOTDIR="/mnt/hdd1/home/joycenerd/AICUP_MangoClassification"
+ROOTDIR="/mnt/md0/new-home/joycenerd/AICUP_MangoClassification"
 
 label_dict = {
     0 : 'A',
@@ -35,6 +36,8 @@ def test():
     sample_submission=pd.read_csv(Path(ROOTDIR).joinpath('test_example.csv'))
     submission=sample_submission.copy()
 
+    out = []
+
     for i,filename in enumerate(sample_submission['image_id']):
         image_path = Path(opt.test_root).joinpath(filename)
         image = Image.open(image_path).convert('RGB')
@@ -42,6 +45,7 @@ def test():
         
         inputs = Variable(image.cuda(opt.cuda_devices))
         outputs =  model(inputs)
+        out.append(outputs)
 
         _,preds = torch.max(outputs.data,1)
         submission['label'][i] =  label_dict[preds[0].item()]
@@ -49,6 +53,7 @@ def test():
         print(filename + ' complete')
 
     submission.to_csv(Path(ROOTDIR).joinpath('submission.csv'), index=False)
+    np.save('output.npy', out)
 
 
 if __name__=='__main__':
