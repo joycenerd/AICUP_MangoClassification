@@ -36,7 +36,6 @@ def test():
     sample_submission=pd.read_csv(Path(ROOTDIR).joinpath('test_example.csv'))
     submission=sample_submission.copy()
 
-    out = []
 
     for i,filename in enumerate(sample_submission['image_id']):
         image_path = Path(opt.test_root).joinpath(filename)
@@ -45,7 +44,6 @@ def test():
         
         inputs = Variable(image.cuda(opt.cuda_devices))
         outputs =  model(inputs)
-        out.append(outputs)
 
         _,preds = torch.max(outputs.data,1)
         submission['label'][i] =  label_dict[preds[0].item()]
@@ -53,7 +51,6 @@ def test():
         print(filename + ' complete')
 
     submission.to_csv(Path(ROOTDIR).joinpath('submission.csv'), index=False)
-    np.save('output.npy', out)
 
 
 if __name__=='__main__':
