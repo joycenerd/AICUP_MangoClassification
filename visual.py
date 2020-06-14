@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib as mpl
 
 
-def visualization(training_loss, training_acc, dev_loss, dev_acc):
+def visualization(training_loss, training_acc, dev_loss, dev_acc,epoch):
     mpl.style.use('default')
     plt.figure(figsize=[8,6])
     plt.plot(training_loss,linewidth=2.0)
@@ -14,7 +14,8 @@ def visualization(training_loss, training_acc, dev_loss, dev_acc):
     plt.xlabel('Epochs',fontsize=16)
     plt.ylabel('Loss',fontsize=16)
     plt.title('Loss Curves',fontsize=16)
-    plt.savefig('./figure/loss_curve.jpg')
+    fig_name = f'./figure/loss_curve_{epoch}.jpg'
+    plt.savefig(fig_name)
 
     plt.figure(figsize=[8,6])
     plt.plot(training_acc,linewidth=2.0)
@@ -23,4 +24,5 @@ def visualization(training_loss, training_acc, dev_loss, dev_acc):
     plt.xlabel('Epochs',fontsize=16)
     plt.ylabel('Accuracy',fontsize=16)
     plt.title('Accuracy Curves',fontsize=16)
-    plt.savefig("./figure/acc_curve.jpg")
+    fig_name = f'./figure/acc_curve_{epoch}.jpg'
+    plt.savefig(figname)

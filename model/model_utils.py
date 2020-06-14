@@ -14,5 +14,7 @@ def get_net(model):
     elif model == 'efficientnet-b4':
         model = EfficientNet.from_pretrained('efficientnet-b4', num_classes = opt.num_classes) 
         return model
-    elif model == 'efficientnet_b3':
+    elif model == 'efficientnet-b3':
         model = EfficientNet.from_pretrained('efficientnet-b3', num_classes = opt.num_classes)
+        return model
+    

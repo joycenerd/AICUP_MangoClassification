@@ -39,7 +39,8 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
     
-    scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
+    # scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
+    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
     record=open('record.txt','w')
 
     for epoch in range(opt.epochs):
@@ -103,10 +104,6 @@ def train():
 
         scheduler.step(dev_acc)
 
-        if (epoch+1)==101:
-            optimizer = torch.optim.SGD(params=model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0001)
-            scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, min_lr=1e-16, cooldown=1)
-
         if dev_acc > best_acc:
             best_acc = dev_acc
             best_dev_loss = dev_loss
@@ -123,6 +120,7 @@ def train():
             record.write(f'{epoch+1}\n')
             record.write(f'Best training loss: {best_train_loss:.4f}\tBest training accuracy: {best_train_acc:.4f}\n')
             record.write(f'Best dev loss: {best_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
+            visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
 
     print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
     print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
