@@ -25,4 +25,4 @@ def visualization(training_loss, training_acc, dev_loss, dev_acc,epoch):
     plt.ylabel('Accuracy',fontsize=16)
     plt.title('Accuracy Curves',fontsize=16)
     fig_name = f'./figure/acc_curve_{epoch}.jpg'
-    plt.savefig(figname)
+    plt.savefig(fig_name)

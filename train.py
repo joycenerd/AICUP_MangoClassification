@@ -37,10 +37,12 @@ def train():
     dev_acc_list = []
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
-    
-    # scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
-    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
+    # optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.5, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
+    step = 0
+
+    scheduler = scheduler = StepLR(optimizer, step_size=5, gamma=0.5, last_epoch=-1)
+    # scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
     record=open('record.txt','w')
 
     for epoch in range(opt.epochs):
@@ -102,7 +104,11 @@ def train():
 
         print(f'Dev loss: {dev_loss:.4f}\taccuracy: {dev_acc:.4f}\n')
 
-        scheduler.step(dev_acc)
+        if step < 17:
+            scheduler.step()
+        else:
+            scheduler.step(dev_acc)
+        step += 1
 
         if dev_acc > best_acc:
             best_acc = dev_acc
@@ -121,6 +127,11 @@ def train():
             record.write(f'Best training loss: {best_train_loss:.4f}\tBest training accuracy: {best_train_acc:.4f}\n')
             record.write(f'Best dev loss: {best_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
             visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
+
+        if step == 17:
+            optimizer = torch.optim.SGD(params=model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.0001)
+            scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
+            
 
     print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
     print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
