@@ -33,8 +33,8 @@ def test():
     model =  model.cuda(opt.cuda_devices)
     model.eval()
 
-    sample_submission=pd.read_csv(Path(ROOTDIR).joinpath('prob_example.csv'))
-    # sample_submission=pd.read_csv(Path(ROOTDIR).joinpath('test_example.csv'))
+    # sample_submission=pd.read_csv(Path(ROOTDIR).joinpath('prob_example.csv'))
+    sample_submission=pd.read_csv(Path(ROOTDIR).joinpath('test_example.csv'))
     submission=sample_submission.copy()
 
 
@@ -47,14 +47,14 @@ def test():
         outputs =  model(inputs)
 
         _,preds = torch.max(outputs.data,1)
-        submission['A'][i] =  outputs[0][0].item()
-        submission['B'][i] =  outputs[0][1].item()
-        submission['C'][i] = outputs[0][2].item()
-        # submission['label'][i] =  label_dict[preds[0].item()]
+        # submission['A'][i] =  outputs[0][0].item()
+        # submission['B'][i] =  outputs[0][1].item()
+        # submission['C'][i] = outputs[0][2].item()
+        submission['label'][i] =  label_dict[preds[0].item()
 
         print(filename + ' complete')
 
-    submission.to_csv(Path(ROOTDIR).joinpath('prob_1.csv'), index=False)
+    submission.to_csv(Path(ROOTDIR).joinpath('submission_1.csv'), index=False)
 
 if __name__=='__main__':
     test()

@@ -37,11 +37,11 @@ def train():
     dev_acc_list = []
 
     criterion = nn.CrossEntropyLoss()
-    # optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
-    optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.5, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
+    optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
+    # optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.5, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
     step = 0
 
-    scheduler = scheduler = StepLR(optimizer, step_size=5, gamma=0.5, last_epoch=-1)
+    scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
     # scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
     record=open('record.txt','w')
 
@@ -66,7 +66,6 @@ def train():
             
             loss.backward()
             optimizer.step()
-            # scheduler.step()
 
             training_loss += loss.item() * inputs.size(0)
             training_corrects += torch.sum(preds == labels.data)
@@ -104,11 +103,11 @@ def train():
 
         print(f'Dev loss: {dev_loss:.4f}\taccuracy: {dev_acc:.4f}\n')
 
-        if step < 17:
+        if (epoch+1) <= 100:
             scheduler.step()
         else:
             scheduler.step(dev_acc)
-        step += 1
+
 
         if dev_acc > best_acc:
             best_acc = dev_acc
@@ -128,8 +127,11 @@ def train():
             record.write(f'Best dev loss: {best_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
             visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
 
-        if step == 17:
-            optimizer = torch.optim.SGD(params=model.parameters(), lr=0.001, momentum=0.9, weight_decay=0.0001)
+        if (epoch+1) == 100:
+            for param_group in optimizer.param_groups:
+                cur_lr = param_group['lr']
+                break
+            optimizer = torch.optim.SGD(params=model.parameters(), lr=cur_lr, momentum=0.9, weight_decay=0.0001)
             scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
             
 
