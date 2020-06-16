@@ -47,7 +47,7 @@ def train():
     scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True, cooldown=1)
     record=open('record.txt','w')
 
-    early_stopping = EarlyStopping(patience=10, verbose=True)
+    early_stopping = EarlyStopping(patience=20, verbose=True)
 
     for epoch in range(opt.epochs):
         print(f'Epoch: {epoch+1}/{opt.epochs}')
@@ -129,12 +129,8 @@ def train():
             visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
 
         if (epoch+1) == 100:
-            for param_group in optimizer.param_groups:
-                cur_lr = param_group['lr']
-                print(cur_lr)
-                break
-            optimizer = adabound.AdaBound(model.parameters(), lr=cur_lr, final_lr=0.1)
             scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=4, verbose=True, cooldown=1)
+            early_stopping = EarlyStopping(patience=10, verbose=True)
         
         early_stopping(dev_loss,model)
         if early_stopping.early_stop:
