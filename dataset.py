@@ -110,20 +110,8 @@ def make_dataset(_dir):
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
     ])
 
-    data_transform_a=transforms.Compose([
+    data_transform=transforms.Compose([
         transforms.Resize((opt.img_size,opt.img_size)),
-        transforms.RandomChoice([
-            transforms.RandomRotation((-45,45)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-        ]),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
-        ])
-
-    data_transform_b=transforms.Compose([
-        transforms.Resize((opt.img_size,opt.img_size)),
-        # transforms.CenterCrop(opt.img_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
     ])
@@ -131,12 +119,11 @@ def make_dataset(_dir):
     if(_dir=='C1-P1_Train'):
         data_set_1=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_1)
         data_set_2=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_2)
-        data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
-        data_set=data_set_1+data_set_2+data_set_3
+        #data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
+        data_set=data_set_1+data_set_2
     elif(_dir=='C1-P1_Dev'):
-        data_set_a=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_a)
-        data_set_b=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_b)
-        data_set=data_set_a+data_set_b
+        data_set=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform)
+    
     return data_set
 
 

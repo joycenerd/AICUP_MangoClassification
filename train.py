@@ -14,6 +14,8 @@ from model.model_utils import get_net
 from tqdm import tqdm
 from visual import visualization
 from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR, CosineAnnealingLR
+from early_stop import EarlyStopping
+import adabound
 
 
 def train():
@@ -37,13 +39,15 @@ def train():
     dev_acc_list = []
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(params=model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=0.0001)
+    optimizer = adabound.AdaBound(model.parameters(), lr=1e-3, final_lr=0.1)
     # optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.5, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
     step = 0
 
-    scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
-    # scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
+    # scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
+    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True, cooldown=1)
     record=open('record.txt','w')
+
+    early_stopping = EarlyStopping(patience=10, verbose=True)
 
     for epoch in range(opt.epochs):
         print(f'Epoch: {epoch+1}/{opt.epochs}')
@@ -103,10 +107,7 @@ def train():
 
         print(f'Dev loss: {dev_loss:.4f}\taccuracy: {dev_acc:.4f}\n')
 
-        if (epoch+1) <= 100:
-            scheduler.step()
-        else:
-            scheduler.step(dev_acc)
+        scheduler.step(dev_acc)
 
 
         if dev_acc > best_acc:
@@ -130,10 +131,15 @@ def train():
         if (epoch+1) == 100:
             for param_group in optimizer.param_groups:
                 cur_lr = param_group['lr']
+                print(cur_lr)
                 break
-            optimizer = torch.optim.SGD(params=model.parameters(), lr=cur_lr, momentum=0.9, weight_decay=0.0001)
-            scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True, cooldown=1)
-            
+            optimizer = adabound.AdaBound(model.parameters(), lr=cur_lr, final_lr=0.1)
+            scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=4, verbose=True, cooldown=1)
+        
+        early_stopping(dev_loss,model)
+        if early_stopping.early_stop:
+            print("Early Stoppping")
+            break
 
     print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
     print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
@@ -141,8 +147,6 @@ def train():
     model.load_state_dict(best_model_params)
     weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_valid_acc.pth')
     torch.save(model, str(weight_path))
-
-    visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list)
         
 
 if __name__=="__main__":

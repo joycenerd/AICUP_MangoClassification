@@ -50,11 +50,11 @@ def test():
         # submission['A'][i] =  outputs[0][0].item()
         # submission['B'][i] =  outputs[0][1].item()
         # submission['C'][i] = outputs[0][2].item()
-        submission['label'][i] =  label_dict[preds[0].item()
+        submission['label'][i] =  label_dict[preds[0].item()]
 
         print(filename + ' complete')
 
-    submission.to_csv(Path(ROOTDIR).joinpath('submission_1.csv'), index=False)
+    submission.to_csv(Path(ROOTDIR).joinpath('submission_3.csv'), index=False)
 
 if __name__=='__main__':
     test()
