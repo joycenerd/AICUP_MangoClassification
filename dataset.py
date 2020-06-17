@@ -119,8 +119,8 @@ def make_dataset(_dir):
     if(_dir=='C1-P1_Train'):
         data_set_1=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_1)
         data_set_2=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_2)
-        #data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
-        data_set=data_set_1+data_set_2
+        data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
+        data_set=data_set_1+data_set_2+data_set_3
     elif(_dir=='C1-P1_Dev'):
         data_set=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform)
     

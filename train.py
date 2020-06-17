@@ -132,10 +132,11 @@ def train():
             scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=4, verbose=True, cooldown=1)
             early_stopping = EarlyStopping(patience=10, verbose=True)
         
-        early_stopping(dev_loss,model)
-        if early_stopping.early_stop:
-            print("Early Stoppping")
-            break
+        if (epoch+1) >= 50:
+            early_stopping(dev_loss,model)
+            if early_stopping.early_stop:
+                print("Early Stoppping")
+                break
 
     print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
     print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
