@@ -44,7 +44,7 @@ def train():
     step = 0
 
     # scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
-    scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True, cooldown=1)
+    # scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True, cooldown=1)
     record=open('record.txt','w')
 
     early_stopping = EarlyStopping(patience=20, verbose=True)
@@ -107,7 +107,7 @@ def train():
 
         print(f'Dev loss: {dev_loss:.4f}\taccuracy: {dev_acc:.4f}\n')
 
-        scheduler.step(dev_acc)
+        # scheduler.step(dev_acc)
 
 
         if dev_acc > best_acc:
@@ -128,15 +128,17 @@ def train():
             record.write(f'Best dev loss: {best_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
             visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
 
+        """
         if (epoch+1) == 100:
             scheduler = ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=4, verbose=True, cooldown=1)
-            early_stopping = EarlyStopping(patience=10, verbose=True)
+            early_stopping = EarlyStopping(patience=10, verbose=True)"""
         
+        """
         if (epoch+1) >= 50:
             early_stopping(dev_loss,model)
             if early_stopping.early_stop:
                 print("Early Stoppping")
-                break
+                break"""
 
     print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
     print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
