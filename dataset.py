@@ -9,6 +9,7 @@ import collections
 import numbers
 import random
 import torch.nn as nn
+# from dataset_utils import *
 
 
 label_dict={
@@ -80,13 +81,28 @@ def make_dataset(_dir):
 
     colour_transform = transforms.Lambda(lambda x: _random_colour_space(x))
 
-    data_transform_1=transforms.Compose([
+    transform = [
+        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
+        transforms.Grayscale(num_output_channels=3),
+        transforms.RandomAffine(degrees=30,shear=50, resample=False, fillcolor=0),
+        transforms.RandomGrayscale(p=0.5),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3, fill=0),
+        transforms.RandomRotation((-90,90), resample=False, expand=False, center=None),
+        transforms.RandomVerticalFlip(p=0.5),
+        # transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False),
+        RandomShift(3),
+        transforms.RandomApply([colour_transform]),
+    ]
+
+    data_transform_train=transforms.Compose([
         transforms.RandomResizedCrop(opt.img_size),
+        transforms.RandomApply(transform, p=0.5),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
 
-    data_transform_2=transforms.Compose([
+    """data_transform_2=transforms.Compose([
         transforms.RandomResizedCrop(opt.img_size ),   
         transforms.RandomChoice([
             transforms.RandomRotation((-45,45)),
@@ -108,24 +124,18 @@ def make_dataset(_dir):
         ]),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
-    ])
+    ])"""
 
-    data_transform=transforms.Compose([
+    data_transform_dev=transforms.Compose([
         transforms.Resize((opt.img_size,opt.img_size)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
     ])
 
     if(_dir=='C1-P1_Train'):
-        data_set_1=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_1)
-        data_set_2=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_2)
-        data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
-        data_set=data_set_1+data_set_2+data_set_3
+        data_set=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_train)
     elif(_dir=='C1-P1_Dev'):
-        data_set_1=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_1)
-        data_set_2=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_2)
-        data_set_3=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_3)
-        data_set=data_set_1+data_set_2+data_set_3
+        data_set=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_dev)
     
     return data_set
 
