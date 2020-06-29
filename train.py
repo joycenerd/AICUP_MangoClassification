@@ -31,20 +31,24 @@ def train():
     model = net
     model=model.cuda(opt.cuda_devices)
 
-    best_model_params = copy.deepcopy(model.state_dict())
+    best_model_params_acc = copy.deepcopy(model.state_dict())
+    best_model_params_loss = copy.deepcopy(model.state_dict())
+
     best_acc=0.0
+    best_loss = float('inf')
+
     training_loss_list = []
     training_acc_list = []
     dev_loss_list = []
     dev_acc_list = []
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = adabound.AdaBound(model.parameters(), lr=1e-3, final_lr=0.1)
-    # optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.5, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
+    # optimizer = adabound.AdaBound(model.parameters(), lr=2e-4, final_lr=0.1)
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
     step = 0
 
     # scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5, verbose=True, cooldown=1)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=4, verbose=True, cooldown=1)
     record=open('record.txt','w')
 
     early_stopping = EarlyStopping(patience=20, verbose=True)
@@ -115,17 +119,31 @@ def train():
 
         if dev_acc > best_acc:
             best_acc = dev_acc
-            best_dev_loss = dev_loss
+            best_acc_dev_loss = dev_loss
 
             best_train_acc=training_acc
             best_train_loss=training_loss 
 
-            best_model_params = copy.deepcopy(model.state_dict())
+            best_model_params_acc = copy.deepcopy(model.state_dict())
+        
+        if dev_loss < best_loss:
+            the_acc = dev_acc
+            best_loss = dev_loss
+
+            the_train_acc = training_acc
+            the_train_loss =  training_loss
+
+            best_model_params_loss = copy.deepcopy(model.state_dict())
 
         if (epoch+1)%50==0:
-            model.load_state_dict(best_model_params)
+            model.load_state_dict(best_model_params_loss)
+            weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_loss:.02f}-best_valid_loss-{the_acc:.02f}-acc.pth')
+            torch.save(model,str(weight_path))
+
+            model.load_state_dict(best_model_params_acc)
             weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{epoch+1}epoch-{best_acc:.02f}-best_train_acc.pth')
             torch.save(model,str(weight_path))
+
             record.write(f'{epoch+1}\n')
             record.write(f'Best training loss: {best_train_loss:.4f}\tBest training accuracy: {best_train_acc:.4f}\n')
             record.write(f'Best dev loss: {best_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
@@ -144,12 +162,23 @@ def train():
                 print("Early Stoppping")
                 break"""
 
+    print('Based on best accuracy:')
     print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
     print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
         
-    model.load_state_dict(best_model_params)
+    model.load_state_dict(best_model_params_acc)
     weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_valid_acc.pth')
     torch.save(model, str(weight_path))
+
+    print('Based on best loss:')
+    print(f'Best training loss: {the_train_loss:.4f}\t Best training accuracy: {the_train_acc:.4f}')
+    print(f'Best dev loss: {best_loss:.4f}\t Best dev accuracy: {the_acc:.4f}\n')
+        
+    model.load_state_dict(best_model_params_loss)
+    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_loss:.02f}-best_valid_loss-{the_acc:.02f}-acc.pth')
+    torch.save(model, str(weight_path))
+
+    visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
         
 
 if __name__=="__main__":

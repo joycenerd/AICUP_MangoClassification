@@ -84,12 +84,6 @@ def make_dataset(_dir):
     transform = [
         transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
         transforms.Grayscale(num_output_channels=3),
-        transforms.RandomAffine(degrees=30,shear=50, resample=False, fillcolor=0),
-        transforms.RandomGrayscale(p=0.5),
-        transforms.RandomHorizontalFlip(p=0.5),
-        transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3, fill=0),
-        transforms.RandomRotation((-90,90), resample=False, expand=False, center=None),
-        transforms.RandomVerticalFlip(p=0.5),
         # transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False),
         RandomShift(3),
         transforms.RandomApply([colour_transform]),
@@ -97,7 +91,13 @@ def make_dataset(_dir):
 
     data_transform_train=transforms.Compose([
         transforms.RandomResizedCrop(opt.img_size),
-        transforms.RandomApply(transform, p=0.5),
+        transforms.RandomAffine(degrees=30,shear=50, resample=False, fillcolor=0),
+        transforms.RandomGrayscale(p=0.5),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3, fill=0),
+        transforms.RandomRotation((-90,90), resample=False, expand=False, center=None),
+        transforms.RandomVerticalFlip(p=0.5),
+        transforms.RandomApply(transform,p=0.5),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
@@ -138,5 +138,4 @@ def make_dataset(_dir):
         data_set=MangoDataset(Path(opt.data_root).joinpath(_dir),data_transform_dev)
     
     return data_set
-
 
