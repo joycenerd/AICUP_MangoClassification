@@ -90,13 +90,13 @@ def make_dataset(_dir):
     ]
 
     data_transform_train=transforms.Compose([
-        transforms.RandomResizedCrop(opt.img_size),
         transforms.RandomAffine(degrees=30,shear=50, resample=False, fillcolor=0),
         transforms.RandomGrayscale(p=0.5),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3, fill=0),
         transforms.RandomRotation((-90,90), resample=False, expand=False, center=None),
         transforms.RandomVerticalFlip(p=0.5),
+        transforms.RandomResizedCrop(opt.img_size),
         transforms.RandomApply(transform,p=0.5),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])

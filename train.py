@@ -137,16 +137,16 @@ def train():
 
         if (epoch+1)%50==0:
             model.load_state_dict(best_model_params_loss)
-            weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_loss:.02f}-best_valid_loss-{the_acc:.02f}-acc.pth')
+            weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{epoch+1}epoch-{best_loss:.02f}-loss-{the_acc:.02f}-acc.pth')
             torch.save(model,str(weight_path))
 
             model.load_state_dict(best_model_params_acc)
-            weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{epoch+1}epoch-{best_acc:.02f}-best_train_acc.pth')
+            weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{epoch+1}epoch-{best_acc:.02f}-acc.pth')
             torch.save(model,str(weight_path))
 
             record.write(f'{epoch+1}\n')
             record.write(f'Best training loss: {best_train_loss:.4f}\tBest training accuracy: {best_train_acc:.4f}\n')
-            record.write(f'Best dev loss: {best_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
+            record.write(f'Best dev loss: {best_acc_dev_loss:.4f}\tBest dev accuracy: {best_acc:.4f}\n\n')
             visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
 
 
@@ -164,10 +164,10 @@ def train():
 
     print('Based on best accuracy:')
     print(f'Best training loss: {best_train_loss:.4f}\t Best training accuracy: {best_train_acc:.4f}')
-    print(f'Best dev loss: {best_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
+    print(f'Best dev loss: { best_acc_dev_loss:.4f}\t Best dev accuracy: {best_acc:.4f}\n')
         
     model.load_state_dict(best_model_params_acc)
-    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_valid_acc.pth')
+    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_acc:.02f}-best_acc.pth')
     torch.save(model, str(weight_path))
 
     print('Based on best loss:')
@@ -175,7 +175,7 @@ def train():
     print(f'Best dev loss: {best_loss:.4f}\t Best dev accuracy: {the_acc:.4f}\n')
         
     model.load_state_dict(best_model_params_loss)
-    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_loss:.02f}-best_valid_loss-{the_acc:.02f}-acc.pth')
+    weight_path=Path(opt.checkpoint_dir).joinpath(f'model-{best_loss:.02f}-best_loss-{the_acc:.02f}-acc.pth')
     torch.save(model, str(weight_path))
 
     visualization(training_loss_list, training_acc_list, dev_loss_list, dev_acc_list, epoch+1)
