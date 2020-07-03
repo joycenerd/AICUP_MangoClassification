@@ -77,54 +77,77 @@ class RandomShift(object):
         
         return img.transform(img.size, Image.AFFINE, (1,0,hshift,0,1,vshift), resample=Image.BICUBIC, fill=1) 
 
+class RandomErasing(object):
+    '''
+    Class that performs Random Erasing in Random Erasing Data Augmentation by Zhong et al.
+    -------------------------------------------------------------------------------------
+    probability: The probability that the operation will be performed.
+    sl: min erasing area
+    sh: max erasing area
+    r1: min aspect ratio
+    mean: erasing value
+    -------------------------------------------------------------------------------------
+    Origin: https://github.com/zhunzhong07/Random-Erasing
+    '''
+
+    def __init__(self, probability=0.5, sl=0.02, sh=0.4, r1=0.3, mean=[0.4914, 0.4822, 0.4465]):
+        self.probability = probability
+        self.mean = mean
+        self.sl = sl
+        self.sh = sh
+        self.r1 = r1
+
+    def __call__(self, img):
+
+        if random.uniform(0, 1) > self.probability:
+            return img
+
+        for attempt in range(100):
+            area = img.size()[1] * img.size()[2]
+
+            target_area = random.uniform(self.sl, self.sh) * area
+            aspect_ratio = random.uniform(self.r1, 1 / self.r1)
+
+            h = int(round(math.sqrt(target_area * aspect_ratio)))
+            w = int(round(math.sqrt(target_area / aspect_ratio)))
+
+            if w < img.size()[2] and h < img.size()[1]:
+                x1 = random.randint(0, img.size()[1] - h)
+                y1 = random.randint(0, img.size()[2] - w)
+                if img.size()[0] == 3:
+                    img[0, x1:x1 + h, y1:y1 + w] = self.mean[0]
+                    img[1, x1:x1 + h, y1:y1 + w] = self.mean[1]
+                    img[2, x1:x1 + h, y1:y1 + w] = self.mean[2]
+                else:
+                    img[0, x1:x1 + h, y1:y1 + w] = self.mean[0]
+                return img
+
+        return img
+
 def make_dataset(_dir):
 
     colour_transform = transforms.Lambda(lambda x: _random_colour_space(x))
 
     transform = [
-        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
-        transforms.Grayscale(num_output_channels=3),
-        # transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0, inplace=False),
-        RandomShift(3),
-        transforms.RandomApply([colour_transform]),
-    ]
-
-    data_transform_train=transforms.Compose([
         transforms.RandomAffine(degrees=30,shear=50, resample=False, fillcolor=0),
         transforms.RandomGrayscale(p=0.5),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3, fill=0),
         transforms.RandomRotation((-90,90), resample=False, expand=False, center=None),
         transforms.RandomVerticalFlip(p=0.5),
+        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
+        transforms.Grayscale(num_output_channels=3),
+        RandomErasing(),
+        RandomShift(3),
+        transforms.RandomApply([colour_transform]),
+    ]
+
+    data_transform_train=transforms.Compose([
         transforms.RandomResizedCrop(opt.img_size),
         transforms.RandomApply(transform,p=0.5),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
-
-    """data_transform_2=transforms.Compose([
-        transforms.RandomResizedCrop(opt.img_size ),   
-        transforms.RandomChoice([
-            transforms.RandomRotation((-45,45)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.RandomAffine(degrees=10,shear=50),
-            RandomShift(3)
-        ]),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
-        ])
-
-    data_transform_3=transforms.Compose([
-        transforms.RandomResizedCrop(opt.img_size),
-        transforms.RandomChoice([
-            transforms.RandomApply([colour_transform]),
-            transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.2, hue=0),
-            transforms.RandomGrayscale(p=0.1)
-        ]),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
-    ])"""
 
     data_transform_dev=transforms.Compose([
         transforms.Resize((opt.img_size,opt.img_size)),
