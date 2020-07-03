@@ -44,7 +44,8 @@ def train():
 
     criterion = nn.CrossEntropyLoss()
     # optimizer = adabound.AdaBound(model.parameters(), lr=2e-4, final_lr=0.1)
-    optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
+    # optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
+    optimizer = torch.optim.SGD(model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=5e-4, nesterov=True)
     step = 0
 
     # scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
