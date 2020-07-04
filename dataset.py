@@ -86,7 +86,6 @@ def make_dataset(_dir):
         transforms.RandomGrayscale(p=0.5),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3, fill=0),
-        transforms.RandomRotation((-90,90), resample=False, expand=False, center=None),
         transforms.RandomVerticalFlip(p=0.5),
         transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
         transforms.Grayscale(num_output_channels=3),
@@ -97,6 +96,7 @@ def make_dataset(_dir):
     data_transform_train=transforms.Compose([
         transforms.RandomResizedCrop(opt.img_size),
         transforms.RandomApply(transform,p=0.5),
+        transforms.RandomApply([transforms.RandomRotation((-90,90), resample=False, expand=False, center=None)],p=0.5),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225])
         ])
