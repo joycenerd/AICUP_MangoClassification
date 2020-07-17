@@ -43,11 +43,11 @@ def train():
     dev_acc_list = []
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = adabound.AdaBound(model.parameters(), lr=opt.lr, final_lr=0.1)
+    # optimizer = adabound.AdaBound(model.parameters(), lr=opt.lr, final_lr=0.1)
     # optimizer = torch.optim.Adam(params=model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0.0001, amsgrad=True)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=5e-4, nesterov=True)
+    optimizer = torch.optim.SGD(model.parameters(), lr=opt.lr, momentum=0.9, weight_decay=5e-4, nesterov=True)
     # optimizer = torch.optim.RMSprop(params=model.parameters(), lr=opt.lr, alpha=0.99, eps=1e-08, weight_decay=5e-4, momentum=0.9, centered=False)
-    optimizer = torch.optim.AdamW(params=model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=5e-4, amsgrad=True)
+    # optimizer = torch.optim.AdamW(params=model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=5e-4, amsgrad=True)
     step = 0
 
     # scheduler = scheduler = StepLR(optimizer, step_size=10, gamma=0.5, last_epoch=-1)
