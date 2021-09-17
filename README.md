@@ -24,4 +24,4 @@ rfconv
 
 ## Results
 
-For now I get 77% accurary when using 200 epochs and only resnet50 as my model
+We can get 84% accuracy using EfficientNet.
